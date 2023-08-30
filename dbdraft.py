@@ -60,7 +60,7 @@ The league operates on a Point Per Reception (PPR) format. Here's a detailed bre
 - **Reception**: Every reception made by a player earns them 1 point (highlighting the PPR format).
 - **Fumble**: Players lose 2 points for every fumble.
 
-Using aggregated data from ESPN, CBS, NFL, and Yahoo, which tallies the points each available player got last year according to the pool rules, and also considering general knowledge of the game of football, players and teams up to 2021, we need to make the best possible picks.
+Using aggregated data from ESPN, CBS, NFL, and Yahoo, which tallies the points each available player got last year according to the pool rules, and also considering general knowledge of the game of football, players and teams up to 2021, we need to make the best possible picks. It is critical that we consider other pool participants picks, as well as the caliber of players left for each position, the number of positions left for our user to fill and all overall fantasy football strategy.
 """
 
 def available_positions():
