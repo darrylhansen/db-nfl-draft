@@ -7,7 +7,7 @@ load_dotenv()
 
 # Set up the API key and organization (if you're part of one)
 openai.api_key = os.getenv("OPENAI_API_KEY")
-openai.organization = "org-KHL9Qhf8DDW1g72cO8Kb56vR"  # You can comment this out if you're not part of an organization
+openai.organization = os.getenv("OPENAI_ORG")  # You can comment this out if you're not part of an organization
 
 # Load the datasets
 espn_data = pd.read_csv('ESPN.csv')
