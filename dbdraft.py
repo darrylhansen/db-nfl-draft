@@ -40,6 +40,9 @@ user_roster = {
     "Bench": []
 }
 
+# Initialized drafted players list
+drafted_players = []
+
 SUPERPROMPT = """
 There is a fantasy football draft taking place with *10 teams*. Each team will have the following roster: 
 - 1 QB
@@ -133,7 +136,7 @@ def pick_player(actual_pick):
             user_roster["Bench"].append(actual_pick)
     else:
         user_roster["Bench"].append(actual_pick)
-    all_data = all_data[all_data['PLAYER'] != actual_pick]
+    all_data = all_data[all_data['PLAYER'].str.lower() != actual_pick_lower]
     return True
 
 def main():
@@ -141,20 +144,24 @@ def main():
     
     first_pick = input("Do you have the first pick? (y/n): ").lower().strip()
     if first_pick == 'y':
-        advice = get_advice([])  # No players taken yet
+        advice = get_advice(drafted_players)  # Initially no players taken yet
         print(f"\nModel's advice for the first pick: {advice}\n")
         actual_pick = input("Enter the name of the player you actually picked: ").strip()
         pick_player(actual_pick)
+        drafted_players.append(actual_pick)
 
     while True:
         players_taken = input("Enter the names of players taken in the last round (comma-separated), or type 'exit' to quit: ").split(",")
         if "exit" in players_taken:
             print("\nExiting Draft Helper. Good luck with your draft, A Train!\n")
             break
-        advice = get_advice(players_taken)
+        drafted_players.extend([player.strip() for player in players_taken])
+        advice = get_advice(drafted_players)
         print(f"\nModel's advice: {advice}\n")
         actual_pick = input("Enter the name of the player you actually picked: ").strip()
         pick_player(actual_pick)
+        drafted_players.append(actual_pick)
+
 
 if __name__ == "__main__":
     main()
