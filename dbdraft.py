@@ -41,7 +41,7 @@ user_roster = {
 }
 
 SUPERPROMPT = """
-There is a fantasy football draft taking place with 10 teams. Each team will have the following roster: 
+There is a fantasy football draft taking place with *10 teams*. Each team will have the following roster: 
 - 1 QB
 - 3 WRs
 - 2 RBs
@@ -60,7 +60,7 @@ The league operates on a Point Per Reception (PPR) format. Here's a detailed bre
 - **Reception**: Every reception made by a player earns them 1 point (highlighting the PPR format).
 - **Fumble**: Players lose 2 points for every fumble.
 
-Using aggregated data from ESPN, CBS, NFL, and Yahoo, which tallies the points each available player got last year according to the pool rules, and also considering general knowledge of the game of football, players and teams up to 2021, we need to make the best possible picks. It is critical that we consider other pool participants picks, as well as the caliber of players left for each position, the number of positions left for our user to fill and all overall fantasy football strategy.
+You will be provided aggregated data from ESPN, CBS, NFL, and Yahoo, which tallies the stats each available player is forecasted by those sources to get this year this year according to the pool rules. You must also consider general knowledge of the game of football, players and teams up to 2021, different fantasy football leagues and strategies to make the best possible picks. It is critical that we consider other pool participants picks, as well as the caliber of players left for each position, the number of positions left for our user to fill and all overall fantasy football strategy.
 """
 
 def available_positions():
@@ -76,16 +76,10 @@ def get_advice(players_taken):
     all_data = all_data[~all_data['PLAYER'].str.lower().isin(players_taken_lower)]
     valid_positions = available_positions()
     
-    # Get the top 25 from each dataset
-    top_espn = espn_data[espn_data['Position'].isin(valid_positions) & ~espn_data['PLAYER'].str.lower().isin(players_taken_lower)].head(25)
-    top_cbs = cbs_data[cbs_data['Position'].isin(valid_positions) & ~cbs_data['PLAYER'].str.lower().isin(players_taken_lower)].head(25)
-    top_nfl = nfl_data[nfl_data['Position'].isin(valid_positions) & ~nfl_data['PLAYER'].str.lower().isin(players_taken_lower)].head(25)
-    top_yahoo = yahoo_data[yahoo_data['Position'].isin(valid_positions) & ~yahoo_data['PLAYER'].str.lower().isin(players_taken_lower)].head(25)
-    
-    # Combine these lists
-    combined_top_players = pd.concat([top_espn, top_cbs, top_nfl, top_yahoo]).drop_duplicates(subset=['PLAYER'])
+    # Get the top 75 from the dataset
+    top_players = all_data[all_data['Position'].isin(valid_positions) & ~all_data['PLAYER'].str.lower().isin(players_taken_lower)].head(75)  # Increased limit to cover possible needs
 
-    detailed_stats = combined_top_players.to_string(index=False)
+    detailed_stats = top_players.to_string(index=False)
     
     additional_context = ""
     if "Bench" in valid_positions:
@@ -93,27 +87,30 @@ def get_advice(players_taken):
 
     user_roster_str = "\n".join([f"{pos}: {', '.join(players) if players else 'None'}" for pos, players in user_roster.items()])
 
-    context_message = SUPERPROMPT + additional_context + "\nThe following players have been taken by others: {}.\n\nYour current roster:\n{}\n\nTop available players based on multiple metrics:\n\n{}".format(
+    context_message = SUPERPROMPT + additional_context + "\nThe following players have been taken by others: {}.\n\nYour current roster:\n{}\n\nTop available players based on aggregated data in .csv format:\n\n{}".format(
         ", ".join(players_taken),
         user_roster_str,
         detailed_stats
     )
 
     # Add print statements here to print out the context message:
-    print("\n**************************************************************")
-    print("Sending the following context to DraftGPT:")
-    print(context_message)
-    print("**************************************************************\n")
+    # print("\n**************************************************************")
+    # print("Sending the following context to DraftGPT:")
+    # print(context_message)
+    # print("**************************************************************\n")
+
+    print("\n\n\n**************************************************************")
+    print("Data sent to DraftGPT, awaiting response.       *You are an A*")
+    print("**************************************************************\n\n\n")
 
     messages = [
         {"role": "system", "content": "You are DraftGPT, a virtual assistant with expertise in the 2023 NFL Fantasy Draft. Your role is to provide insights and advice on player selections based on the current draft situation."},
         {"role": "user", "content": context_message},
-        {"role": "user", "content": "Who should we pick next?"}
+        {"role": "user", "content": "Who should we pick next? It is critical to ensure we employ the best strategy possible considering the fantasy football league type, structure, roster and scoring system. We must assess which players from the top players remaining are likely to both make the best contribution, but also have the best value considering the current round, roster positions and the depth of each type of point getting position in the overall NFL league. This means picking the right positions at the right time considering the depth of available talent, and it is a critical consideration. Please provide advice on the top three picks we could make, along with logic why each would be a good pick, followed by your overall recommendation for the best pick from available players."}
     ]
 
     response = openai.ChatCompletion.create(model="gpt-4", messages=messages)
     return response.choices[0].message.content.strip()
-
 
 def pick_player(actual_pick):
     """Handle picking a player and updating rosters and available data."""
@@ -152,7 +149,7 @@ def main():
     while True:
         players_taken = input("Enter the names of players taken in the last round (comma-separated), or type 'exit' to quit: ").split(",")
         if "exit" in players_taken:
-            print("\nExiting Draft Helper. Good luck with your draft!\n")
+            print("\nExiting Draft Helper. Good luck with your draft, A Train!\n")
             break
         advice = get_advice(players_taken)
         print(f"\nModel's advice: {advice}\n")
